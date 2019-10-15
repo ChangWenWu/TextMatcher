@@ -1,0 +1,5 @@
+.resultlist-container{
+    text-align:left;
+    height: 450px; 
+    overflow-y: scroll;
+}
