@@ -1,6 +1,5 @@
 import PinyinMatch from 'pinyin-match'
 
-//const sampleList = require('./sampleList.json')
 export const textMatcher = (resource, inputText) => {
     const textResult = []
     const position = []

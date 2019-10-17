@@ -38,9 +38,6 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div className="test-data">
-          {/* <FlavorForm /> */}
-        </div>
         <div className="test-file">
           <p>请选择文件</p>
           <input type="file" onChange={this.selectFile}/>
@@ -51,7 +48,6 @@ class App extends Component {
         </div>
         <div className="match-result">
           <p>匹配结果</p>
-          {/* <input type="result" value={this.state.value} onChange={this.handleChange} /> */}
           <ResultList textResult={this.state.textResult} position={this.state.position}/>
         </div>
       </div>

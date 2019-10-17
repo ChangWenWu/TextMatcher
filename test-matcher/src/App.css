@@ -1,26 +1,19 @@
 .App {
-  text-align: center;
+  padding: 20px;
+  text-align:left;
 }
 
-.test-file {
-    margin:80px auto 0 auto;
+.test-file input {
+  width:100%;
 }
 
 .test-matcher {
-  margin-top: 80px;
+  margin-top: 20px;
 }
- .test-data {
-  margin-top: 80px;
-  border-color: red;
-  border-width: 1px;
- }
 
  .match-result {
-  margin-top: 80px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
- }
+  margin-top: 20px;
+  }
 
 
 .App-header {
