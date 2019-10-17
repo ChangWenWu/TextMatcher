@@ -9,8 +9,8 @@ class App extends Component {
   }
 
   handleChange = (event) => {
-    const inputText = event.target.value
-    const {textResult=[],position=[]} = !!inputText ? textMatcher(inputText) : {}
+    const inputText = event.target.value;
+    const {textResult=[],position=[]} = !!inputText ? textMatcher(this.state.resource, inputText) : {};
     this.setState({
       value: inputText,
       textResult,
