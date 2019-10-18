@@ -35,6 +35,17 @@ class App extends Component {
     };
   }
 
+  exportFile = (event) => {
+    const resultStr = '1,2,3,4,5';
+    const blob = new Blob(["\uFEFF" + resultStr], { type: 'text/csv;charset=utf-8;' });
+    const filename = "export_file.csv";
+    const link = document.createElement("a");
+    link.download = filename;//这里替换为你需要的文件名
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  };
+
+
   render() {
     return (
       <div className="App">
@@ -49,6 +60,9 @@ class App extends Component {
         <div className="match-result">
           <p>匹配结果</p>
           <ResultList textResult={this.state.textResult} position={this.state.position}/>
+        </div>
+        <div className = "export-button">
+          <button onClick={this.exportFile}>导出</button>
         </div>
       </div>
     );
