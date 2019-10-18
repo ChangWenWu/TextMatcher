@@ -1,21 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
-import { ResultList } from './ResultList/index.js';
 import { textMatcher } from './utils/textMatcher';
+import _ from 'lodash'
+import XLSX from 'xlsx'
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = { source: [], keywords: [] ,textResult : [],position:[]};
-  }
-
-  handleChange = (event) => {
-    const inputText = event.target.value;
-    const {textResult=[],position=[]} = !!inputText ? textMatcher(this.state.resource, inputText) : {};
-    this.setState({
-      value: inputText,
-      textResult,
-      position
-    });
   }
 
   selectSourceFile = (event) => {
@@ -33,7 +24,7 @@ class App extends Component {
       });
       console.log(source);
       this.setState({
-        source: source,
+        source: _.compact(source)
       });
     };
   }
@@ -51,19 +42,32 @@ class App extends Component {
       const keywords = reader.result.split("\n");
       console.log(keywords);
       this.setState({
-        keywords: keywords
+        keywords: _.compact(keywords)
       });
     };
   }
 
   exportFile = (event) => {
-    const resultStr = '1,2,3,4,5';
-    const blob = new Blob(["\uFEFF" + resultStr], { type: 'text/csv;charset=utf-8;' });
-    const filename = "export_file.csv";
-    const link = document.createElement("a");
-    link.download = filename;//这里替换为你需要的文件名
-    link.href = URL.createObjectURL(blob);
-    link.click();
+    const resultStr = [];
+    (this.state.keywords||[]).forEach((item,index)=>{
+      if(!_.isEmpty(item)){
+      const {textResult,indexResult} = textMatcher(this.state.source, item)
+      resultStr.push([indexResult.slice(0, 3).join(',')])
+      }
+    });
+
+      const ws = XLSX.utils.aoa_to_sheet(resultStr);
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
+      console.log('csv',wb);
+      XLSX.writeFile(wb, ('SheetJSTableExport.csv'));
+    // const blob = new Blob(wb, { type: 'text/csv;charset=utf-8;' });
+    // // const blob = new Blob(["\uFEFF" + resultStr], { type: 'text/csv;charset=utf-8;' });
+    // const filename = "export_file.csv";
+    // const link = document.createElement("a");
+    // link.download = filename;//这里替换为你需要的文件名
+    // link.href = URL.createObjectURL(blob);
+    // link.click();
   };
 
 
@@ -78,7 +82,7 @@ class App extends Component {
           <p>请选择关键字文件</p>
           <input type="file" onChange={this.selectKeywordsFile}/>
         </div>
-        <div className = "export-button">
+        <div className="export-button">
           <button onClick={this.exportFile}>导出</button>
         </div>
       </div>

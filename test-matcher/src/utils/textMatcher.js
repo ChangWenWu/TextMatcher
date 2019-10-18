@@ -2,13 +2,16 @@ import PinyinMatch from 'pinyin-match'
 
 export const textMatcher = (resource, inputText) => {
     const textResult = []
-    const position = []
-    resource.forEach(element => {
+    const indexResult = []
+    resource.forEach((element,index) => {
         const match = PinyinMatch.match(element, String(inputText))
         if (!!match) {
             textResult.push(element)
-            position.push(match)
+            indexResult.push(index)
         }
     });
-    return {textResult,position}
+    return {
+        textResult,
+        indexResult
+    }
 }
