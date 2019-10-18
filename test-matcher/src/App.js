@@ -5,7 +5,7 @@ import { textMatcher } from './utils/textMatcher';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { resource: [], value: '' ,textResult : [],position:[]};
+    this.state = { source: [], keywords: [] ,textResult : [],position:[]};
   }
 
   handleChange = (event) => {
@@ -18,7 +18,7 @@ class App extends Component {
     });
   }
 
-  selectFile = (event) => {
+  selectSourceFile = (event) => {
     var selectedFile = event.target.files[0];
     var name = selectedFile.name;
     var size = selectedFile.size;
@@ -27,10 +27,31 @@ class App extends Component {
     reader.readAsText(selectedFile);
 
     reader.onload = () =>{
-      const strArray = reader.result.split("\n");
-      console.log(strArray);
+      console.log(reader.result);
+      const source = reader.result.split("\n").map((item) =>{
+        return item.split(",")[1];
+      });
+      console.log(source);
       this.setState({
-        resource: strArray,
+        source: source,
+      });
+    };
+  }
+
+  selectKeywordsFile = (event) => {
+    var selectedFile = event.target.files[0];
+    var name = selectedFile.name;
+    var size = selectedFile.size;
+    console.log("文件名:"+name+"大小："+size);
+    var reader = new FileReader();
+    reader.readAsText(selectedFile);
+
+    reader.onload = () =>{
+      console.log(reader.result);
+      const keywords = reader.result.split("\n");
+      console.log(keywords);
+      this.setState({
+        keywords: keywords
       });
     };
   }
@@ -50,16 +71,12 @@ class App extends Component {
     return (
       <div className="App">
         <div className="test-file">
-          <p>请选择文件</p>
-          <input type="file" onChange={this.selectFile}/>
+          <p>请选择数据源文件</p>
+          <input type="file" onChange={this.selectSourceFile}/>
         </div>
-        <div className="test-matcher">
-          <p>请输入匹配字符</p>
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
-        </div>
-        <div className="match-result">
-          <p>匹配结果</p>
-          <ResultList textResult={this.state.textResult} position={this.state.position}/>
+        <div className="test-file">
+          <p>请选择关键字文件</p>
+          <input type="file" onChange={this.selectKeywordsFile}/>
         </div>
         <div className = "export-button">
           <button onClick={this.exportFile}>导出</button>
