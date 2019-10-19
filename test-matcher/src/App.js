@@ -49,10 +49,16 @@ class App extends Component {
 
   exportFile = (event) => {
     const resultStr = [];
+
     (this.state.keywords||[]).forEach((item,index)=>{
       if(!_.isEmpty(item)){
       const {textResult,indexResult} = textMatcher(this.state.source, item)
-      resultStr.push([indexResult.slice(0, 3).join(',')])
+      if (_.isEmpty(indexResult)) {
+        resultStr.push([''])
+      }else{
+        resultStr.push(indexResult.slice(0, 3))
+      }
+      // console.log('result',resultStr)
       }
     });
 
@@ -61,8 +67,9 @@ class App extends Component {
       XLSX.utils.book_append_sheet(wb, ws, "SheetJS");
       console.log('csv',wb);
       XLSX.writeFile(wb, ('SheetJSTableExport.csv'));
-    // const blob = new Blob(wb, { type: 'text/csv;charset=utf-8;' });
-    // // const blob = new Blob(["\uFEFF" + resultStr], { type: 'text/csv;charset=utf-8;' });
+    //   const blob = new Blob(["\uFEFF" + resultStr], {
+    //     type: 'text/csv;charset=utf-8;'
+    //   })
     // const filename = "export_file.csv";
     // const link = document.createElement("a");
     // link.download = filename;//这里替换为你需要的文件名

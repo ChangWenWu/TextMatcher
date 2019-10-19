@@ -7,7 +7,7 @@ export const textMatcher = (resource, inputText) => {
         const match = PinyinMatch.match(element, String(inputText))
         if (!!match) {
             textResult.push(element)
-            indexResult.push(index)
+            indexResult.push(index+1)
         }
     });
     return {
