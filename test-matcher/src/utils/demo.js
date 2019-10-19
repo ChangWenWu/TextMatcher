@@ -62,7 +62,7 @@ const readSource = () => {
 
 
 const readTestcase = () => {
-    const csvFile = "./testcase_wps.csv";
+    const csvFile = "./true_testcase_wps.csv";
     const workbook = XLSX.readFile(csvFile, {
         codepage: 65001
     });
@@ -89,7 +89,37 @@ const getSliceWord = (inputText) => {
     // 开始分词
     return _.uniq(_.map(segment.doSegment(inputText, {
         stripPunctuation: true,
-        stripStopword:true}), item => item.w));
+        convertSynonym:true,
+        stripStopword:true
+    }), item => item.w));
+}
+
+const calScore = (inputArr)=>{
+    // [
+    //     [1, 2, 3, 4],
+    //     [4, 1, 2, 3],
+    //     [1, 2, 3, 4],
+    //     [3, 1, 2, 4]
+    // ]
+
+    // [ [ { index: 629, accuracy: 1 },
+    // { index: 630, accuracy: 1 },
+    // { index: 631, accuracy: 1 },
+    // { index: 632, accuracy: 1 },
+    // { index: 633, accuracy: 1 },
+
+    const result = [] // [{index:1,score:2},{index:2,score:33}]
+    inputArr.forEach(itemArr=>{
+        itemArr.forEach((item,index)=>{
+            const foundIndex = _.findIndex(result, resultItem => resultItem.index === item.index)
+            if(foundIndex === -1){
+                result.push({index:item.index,score:item.accuracy})
+            } else {
+                result[foundIndex].score += index
+            }
+        })
+    })
+    return _.map(_.orderBy(result,['score'],['asc']),item=>item.index)
 }
 
 const calPinyin = (source,testcase) =>{
@@ -110,21 +140,21 @@ const calPinyin = (source,testcase) =>{
         resultSliceArr.push(_.concat(indexResult))
         })
         // end  用pinyin 对分词进行搜索
-        // start 对pinyin搜索结果的数组进行：分词nlp
-        const callAllArr = calAll(resultSliceArr)
-        // const callAllSourceText = _.map(callAllArr,index=>source[index-1])
+        // start 对pinyin搜索结果的数组进行：整句nlp
+        let callAllArr = calAll(resultSliceArr)
+        const callAllSourceText = _.map(callAllArr,index=>source[index-1])
         // const indexResult_nlp = []
         // sliceArr.forEach(sliceItem=>{
-        //     indexResult_nlp.push(_.map(similarSearch(callAllSourceText, sliceItem), item => item.index))
+         const result = _.map(similarSearch(callAllSourceText, item), item => item.index)
+        //  console.log('result',result)
         // })
-        // const nlpResult = _.map(similarSearch(callAllSourceText, item), resultItem => callAllArr[resultItem.index-1])
-        // console.log('nlpResult',indexResult_nlp)
-        // end 分词nlp
+        callAllArr = _.map(result, scoreItem => callAllArr[scoreItem-1])
+        // end 整句nlp
         if (_.isEmpty(callAllArr)) {
-            console.log('empty',callAllArr,resultSliceArr)
+            console.log('empty',item,callAllArr,resultSliceArr)
             returnVal.push([0])
         }else{
-            returnVal.push(callAllArr)
+            returnVal.push(callAllArr.slice(0,3))
         }
     })
     return returnVal
@@ -135,12 +165,12 @@ const calAll =(resultArr)=>{
     // resultArr = [[1,2,3,4],[3,4,5,6],[7,8,9,0]]
     const indexArr = [] // {index:123,count:2}
     const flatResultArr = _.flatten(resultArr)
-    let maxCount = 0;
+    let maxCount = 1;
     flatResultArr.forEach(arrItem => {
         const foundIndex = _.findIndex(indexArr,item => item.index === arrItem)
         if(foundIndex === -1){
             indexArr.push({index:arrItem,count:1})
-          
+            
         }else{
             indexArr[foundIndex].count +=1;
             if (indexArr[foundIndex].count >=maxCount){
@@ -148,9 +178,11 @@ const calAll =(resultArr)=>{
             }
         }
     })
-    const tmp = _.map(_.orderBy(indexArr, ['count'], ['desc']),item=>item.index)
-    // const output = _.map(_.filter(_.orderBy(indexArr, ['count'], ['desc']),item=>item.count === maxCount),item=>item.index)
-    return tmp.slice(0,3)
+    // const tmp = _.map(_.orderBy(indexArr, ['count'], ['desc']),item=>item.index)
+    // const tmpFilter = _.filter(tmp,item=>item.count===maxCount)
+    // console.log('tmpFilter',maxCount,tmpFilter)
+    const output = _.map(_.orderBy(indexArr, ['count'], ['desc']),item=>item.index)
+    return output
 }
 
 const genExcel = (data,title) => {
@@ -163,7 +195,7 @@ const genExcel = (data,title) => {
 
 const source = readSource()
 const testcase = readTestcase()
-// const nlp = calAccuracy(source, testcase)
+////// const nlp = calAccuracy(source, testcase)
 const pinyin = calPinyin(source,testcase)
-// genExcel(nlp,'nlp')
+ ///// genExcel(nlp,'nlp')
 genExcel(pinyin,'pinyin')
