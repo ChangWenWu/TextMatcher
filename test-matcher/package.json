@@ -5,7 +5,7 @@
   "dependencies": {
     "babel-preset-react": "^6.24.1",
     "compromise": "^11.14.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "node-nlp": "^3.10.0",
     "pinyin-match": "^1.0.9",
     "react": "^16.10.2",
